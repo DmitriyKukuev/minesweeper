@@ -1,10 +1,10 @@
 <template>
     <BaseLayout>
-        <GameBoard/>
+        <GameGrid/>
     </BaseLayout>
 </template>
 
 <script setup lang="ts">
 import BaseLayout from '@/components/layouts/BaseLayout.vue';
-import GameBoard from '@/components/game/GameBoard.vue';
+import GameGrid from '@/components/game/GameGrid.vue';
 </script>
