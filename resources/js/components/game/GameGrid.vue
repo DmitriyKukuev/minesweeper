@@ -23,7 +23,7 @@ const canvasAttrs = computed(() => ({
     height: settings.rows * settings.cellSize,
 }));
 
-function onCanvasClick(event: PointerEvent) {
+function onCanvasClick(event: MouseEvent) {
     game.value?.updateByCoords(event.offsetX, event.offsetY);
 }
 
