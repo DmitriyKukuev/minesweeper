@@ -1,5 +1,22 @@
 <template>
-    <div>
+    <div class="space-y-2">
+        <div>
+            <div class="todo">
+                todo сделать изменение и вывод настроек
+            </div>
+
+            <div class="font-bold">
+                Настройки
+            </div>
+
+            <div
+                v-for="(value, key) in settings"
+                :key="key"
+            >
+                {{key}}: {{value}}
+            </div>
+        </div>
+
         <canvas v-bind="canvasAttrs" ref="canvasEl" @click="onCanvasClick"/>
     </div>
 </template>
@@ -11,10 +28,11 @@ import Game from '@/game/Game.ts';
 const canvasEl = ref<HTMLCanvasElement|null>(null);
 const game = ref<Game|null>(null);
 
-// todo
+// todo класс с настройками игры
 const settings = {
     columns: 20,
     rows: 15,
+    mineCount: 50,
     cellSize: 25,
 }
 
@@ -38,7 +56,7 @@ function init() {
         return;
     }
 
-    game.value = new Game(settings.columns, settings.rows, settings.cellSize, context);
+    game.value = new Game(settings, context);
     game.value?.start();
 }
 
