@@ -7,7 +7,7 @@ export default class Game {
         protected columns: number,
         protected rows: number,
         protected cellSize: number,
-        protected context: CanvasRenderingContext2D,
+        protected context: CanvasRenderingContext2D, // todo refac
     ) {
     }
 
@@ -35,5 +35,17 @@ export default class Game {
         }
 
         this.draw();
+    }
+
+    protected getCellByCoords(x: number, y: number): Cell {
+        const column = Math.floor(x / this.cellSize);
+        const row = Math.floor(y / this.cellSize);
+
+        return this.cells[row][column];
+    }
+
+    public updateByCoords(x: number, y: number): void {
+        const cell = this.getCellByCoords(x, y);
+        cell.check().draw();
     }
 }

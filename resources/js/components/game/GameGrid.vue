@@ -1,6 +1,6 @@
 <template>
     <div>
-        <canvas v-bind="canvasAttrs" ref="canvasEl"/>
+        <canvas v-bind="canvasAttrs" ref="canvasEl" @click="onCanvasClick"/>
     </div>
 </template>
 
@@ -9,6 +9,7 @@ import {computed, onMounted, ref} from 'vue';
 import Game from '@/game/Game.ts';
 
 const canvasEl = ref<HTMLCanvasElement|null>(null);
+const game = ref<Game|null>(null);
 
 // todo
 const settings = {
@@ -22,6 +23,10 @@ const canvasAttrs = computed(() => ({
     height: settings.rows * settings.cellSize,
 }));
 
+function onCanvasClick(event: PointerEvent) {
+    game.value?.updateByCoords(event.offsetX, event.offsetY);
+}
+
 function init() {
     if (!canvasEl.value) {
         return;
@@ -33,9 +38,8 @@ function init() {
         return;
     }
 
-    const game = new Game(settings.columns, settings.rows, settings.cellSize, context);
-    console.log(game); //todo remove
-    game.start();
+    game.value = new Game(settings.columns, settings.rows, settings.cellSize, context);
+    game.value?.start();
 }
 
 onMounted(() => {
