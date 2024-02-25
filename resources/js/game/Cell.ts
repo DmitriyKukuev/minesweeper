@@ -1,6 +1,9 @@
+const MAX_AROUND_MINE_COUNT = 8;
+
 export default class Cell {
     protected isChecked: boolean = false;
-    protected hasMine: boolean = false;
+    public aroundMineCount: number = 0;
+    protected mine: boolean = false;
 
     constructor(
         protected size: number,
@@ -10,10 +13,46 @@ export default class Cell {
     ) {
     }
 
+    get hasMine(): boolean {
+        return this.mine;
+    }
+
+    get hasAroundMineCount(): boolean {
+        return this.aroundMineCount > 0;
+    }
+
+    public setMine(): this {
+        this.mine = true
+        this.aroundMineCount = -1; // для дебага
+
+        return this;
+    }
+
+    public check(): this {
+        this.isChecked = true;
+
+        return this;
+    }
+
+    public setAroundMineCount(value: number) {
+        if (value > MAX_AROUND_MINE_COUNT) {
+            throw new Error('Максимум 8 мин вокруг');
+        }
+
+        if (!this.hasMine) {
+            this.aroundMineCount = value;
+        }
+
+        return this;
+    }
+
     //todo refac и красивый квадрат
     public draw(): void {
         const x = this.column * this.size;
         const y = this.row * this.size;
+        const halsSize = Math.ceil(this.size / 2);
+        const centerX = x + halsSize;
+        const centerY = y + halsSize;
 
         this.context.clearRect(x, y, this.size, this.size);
 
@@ -29,11 +68,9 @@ export default class Cell {
             this.context.strokeRect(x + 1, y + 1, this.size - 2, this.size - 2);
         }
 
-        //todo показываем мину всегда
+        //todo отрисовка для дебага
+
         if (this.hasMine) {
-            const halsSize = Math.ceil(this.size / 2);
-            const centerX = x + halsSize;
-            const centerY = y + halsSize;
             const radius = Math.ceil(this.size / 4);
 
             this.context.beginPath();
@@ -41,17 +78,11 @@ export default class Cell {
             this.context.fillStyle = '#e51919';
             this.context.fill();
         }
-    }
 
-    public check(): this {
-        this.isChecked = true;
-
-        return this;
-    }
-
-    public setMine(): this {
-        this.hasMine = true
-
-        return this;
+        if (this.hasAroundMineCount) {
+            this.context.fillStyle = '#111111';
+            this.context.font = '14px Arial';
+            this.context.fillText(this.aroundMineCount, centerX, centerY)
+        }
     }
 }
