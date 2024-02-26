@@ -3,8 +3,8 @@ import {random} from '@/helper/common.ts';
 
 export default class Game {
     protected cells: Cell[][] = [];
-    protected columns: number = 0;
-    protected rows: number = 0;
+    protected columns: number = 0; // todo не нравится название
+    protected rows: number = 0; // todo не нравится название
     protected cellSize: number = 0;
     protected mineCount: number = 0;
 
@@ -35,7 +35,7 @@ export default class Game {
             const row: Cell[] = [];
 
             for (let j = 0; j < this.columns; j++) {
-                row.push(new Cell(this.cellSize, j, i, this.context));
+                row.push(new Cell(this.cellSize, i, j, this.context));
             }
 
             this.cells.push(row);
@@ -65,43 +65,58 @@ export default class Game {
         return this.cells[row][column];
     }
 
-    public updateByCoords(x: number, y: number): void {
-        const cell = this.getCellByCoords(x, y);
-        cell.check().draw();
+    //todo отдельный метод для отрисовки мин
+    public onClick(x: number, y: number): void {
+        const cellsToCheckAround: Cell[] = [];
+        const firstCell = this.getCellByCoords(x, y);
+
+        cellsToCheckAround.push(firstCell);
+
+        do {
+            const cell = cellsToCheckAround.pop();
+
+            if (!cell || cell.isChecked) {
+                continue;
+            }
+
+            cell.onClick();
+
+            if (cell.hasMine) {
+                return;
+            }
+
+            if (cell.hasAroundMineCount) {
+                continue;
+            }
+
+            cell.forAroundCells((nearCell) => {
+                cellsToCheckAround.push(nearCell);
+            }, this.rows, this.columns, this.cells);
+        } while (cellsToCheckAround.length)
     }
 
-    public setCellsAroundMineCount(): void {
+    protected setCellAroundMineCount(cell: Cell): void {
+        if (cell.hasMine) {
+            return;
+        }
+
+        let aroundMineCount = 0;
+
+        cell.forAroundCells((nearCell) => {
+            if (nearCell.hasMine) {
+                aroundMineCount++;
+            }
+        }, this.rows, this.columns, this.cells);
+
+        cell.setAroundMineCount(aroundMineCount);
+    }
+
+    protected setCellsAroundMineCount(): void {
         for (let row = 0; row < this.rows; row++) {
             for (let column = 0; column < this.columns; column++) {
                 const cell = this.cells[row][column];
 
-                if (cell.hasMine) {
-                    continue;
-                }
-
-                let aroundMineCount = 0;
-
-                for (let i = row - 1; i <= row + 1; i++) {
-                    for (let j = column - 1; j <= column + 1; j++) {
-                        if (
-                            (i === row && j === column)
-                            || i < 0
-                            || i >= this.rows
-                            || j < 0
-                            || j >= this.columns
-                        ) {
-                            continue;
-                        }
-
-                        const nearCell = this.cells[i][j];
-
-                        if (nearCell.hasMine) {
-                            aroundMineCount++;
-                        }
-                    }
-                }
-
-                cell.setAroundMineCount(aroundMineCount);
+                this.setCellAroundMineCount(cell);
             }
         }
     }

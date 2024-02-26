@@ -42,7 +42,7 @@ const canvasAttrs = computed(() => ({
 }));
 
 function onCanvasClick(event: MouseEvent) {
-    game.value?.updateByCoords(event.offsetX, event.offsetY);
+    game.value?.onClick(event.offsetX, event.offsetY);
 }
 
 function init() {
