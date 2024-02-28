@@ -17,6 +17,8 @@
             </div>
         </div>
 
+        <button class="btn" @click="start">new game</button>
+
         <canvas v-bind="canvasAttrs" ref="canvasEl" @click="onCanvasClick"/>
     </div>
 </template>
@@ -30,9 +32,9 @@ const game = ref<Game|null>(null);
 
 // todo класс с настройками игры
 const settings = {
-    columns: 20,
-    rows: 15,
-    mineCount: 50,
+    columns: 30,
+    rows: 16,
+    mineCount: 99,
     cellSize: 25,
 }
 
@@ -43,6 +45,10 @@ const canvasAttrs = computed(() => ({
 
 function onCanvasClick(event: MouseEvent) {
     game.value?.onClick(event.offsetX, event.offsetY);
+}
+
+function start() {
+    game.value?.init();
 }
 
 function init() {
@@ -57,7 +63,7 @@ function init() {
     }
 
     game.value = new Game(settings, context);
-    game.value?.start();
+    game.value?.init();
 }
 
 onMounted(() => {

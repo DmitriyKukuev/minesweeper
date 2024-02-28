@@ -8,8 +8,8 @@ export default class Cell {
 
     constructor(
         protected size: number,
-        protected row: number, // todo не нравится название
-        protected column: number, // todo не нравится название
+        public row: number, // todo не нравится название
+        public column: number, // todo не нравится название
         protected context: CanvasRenderingContext2D, // todo один глобальный
     ) {
         this.id = `${row}-${column}`;
@@ -97,6 +97,7 @@ export default class Cell {
     }
 
     //todo refac и красивый квадрат
+    //todo сделать дебаг-рисование с читами
     public draw(): void {
         const x = this.column * this.size;
         const y = this.row * this.size;

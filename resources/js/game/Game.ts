@@ -1,5 +1,13 @@
 import Cell from '@/game/Cell.ts';
-import {random} from '@/helper/common.ts';
+import {random, randomWithExcluded} from '@/helper/random.ts';
+
+enum EGameStatus {
+    created,
+    initiated,
+    started,
+    won,
+    lost,
+}
 
 export default class Game {
     protected cells: Cell[][] = [];
@@ -7,6 +15,7 @@ export default class Game {
     protected rows: number = 0; // todo не нравится название
     protected cellSize: number = 0;
     protected mineCount: number = 0;
+    protected status: EGameStatus = EGameStatus.created;
 
     constructor(
         settings, //todo сделать объект настроек и передавать
@@ -16,6 +25,15 @@ export default class Game {
         this.rows = settings.rows;
         this.cellSize = settings.cellSize;
         this.mineCount = settings.mineCount;
+    }
+
+    get isStarted(): boolean {
+        return this.status === EGameStatus.started;
+    }
+
+    get isFinished(): boolean {
+        return this.status === EGameStatus.won
+            || this.status === EGameStatus.lost;
     }
 
     protected draw(): void {
@@ -30,7 +48,19 @@ export default class Game {
         }
     }
 
-    public start(): void {
+    /**
+     * @param firstCell Ячейка вокруг и в которой не сгенерируются мины
+     */
+    public start(firstCell?: Cell): void {
+        this.generateMines(firstCell);
+        this.setCellsAroundMineCount();
+        this.status = EGameStatus.started;
+        this.draw(); // todo remove
+    }
+
+    public init(): void {
+        this.cells = [];
+
         for (let i = 0; i < this.rows; i++) {
             const row: Cell[] = [];
 
@@ -41,17 +71,42 @@ export default class Game {
             this.cells.push(row);
         }
 
-        //todo пока при запуске игры, а не первом клике
-        this.generateMines();
-        this.setCellsAroundMineCount();
+        this.status = EGameStatus.initiated;
         this.draw();
     }
 
-    //todo сделать при первом клике
-    public generateMines(): void {
+    /**
+     * todo - понял, что неправильный алгоритмы генерации
+     * @param firstCell Ячейка вокруг и в которой не сгенерируются мины
+     */
+    public generateMines(firstCell?: Cell): void {
+        if (!firstCell) {
+            for (let i = 0; i < this.mineCount; i++) {
+                const column = random(0, this.columns - 1);
+                const row = random(0, this.rows - 1);
+                const cell = this.cells[row][column];
+
+                cell.setMine();
+            }
+
+            return;
+        }
+
+        const excludedColumnIndexes = [
+            firstCell.column - 1,
+            firstCell.column,
+            firstCell.column + 1,
+        ];
+
+        const excludedRowIndexes = [
+            firstCell.row - 1,
+            firstCell.row,
+            firstCell.row + 1,
+        ];
+
         for (let i = 0; i < this.mineCount; i++) {
-            const column = random(0, this.columns - 1);
-            const row = random(0, this.rows - 1);
+            const column = randomWithExcluded(0, this.columns - 1, excludedColumnIndexes);
+            const row = randomWithExcluded(0, this.rows - 1, excludedRowIndexes);
             const cell = this.cells[row][column];
 
             cell.setMine();
@@ -67,9 +122,13 @@ export default class Game {
 
     //todo отдельный метод для отрисовки мин
     public onClick(x: number, y: number): void {
-        const cellsToCheckAround: Cell[] = [];
         const firstCell = this.getCellByCoords(x, y);
 
+        if (!this.isStarted) {
+            this.start(firstCell);
+        }
+
+        const cellsToCheckAround: Cell[] = [];
         cellsToCheckAround.push(firstCell);
 
         do {
