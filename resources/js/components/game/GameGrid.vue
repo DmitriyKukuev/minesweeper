@@ -19,6 +19,8 @@
 
         <button class="btn" @click="start">new game</button>
 
+        <div>realMinesCount: {{ game?.realMinesCount ?? 0 }}</div>
+
         <canvas v-bind="canvasAttrs" ref="canvasEl" @click="onCanvasClick"/>
     </div>
 </template>

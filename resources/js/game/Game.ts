@@ -27,13 +27,27 @@ export default class Game {
         this.minesCount = settings.mineCount;
     }
 
-    get isStarted(): boolean {
+    public get isStarted(): boolean {
         return this.status === EGameStatus.started;
     }
 
-    get isFinished(): boolean {
+    public get isFinished(): boolean {
         return this.status === EGameStatus.won
             || this.status === EGameStatus.lost;
+    }
+
+    public get realMinesCount(): number {
+        let count = 0;
+
+        this.cells.forEach((row) => {
+            row.forEach((cell) => {
+                if (cell.hasMine) {
+                    count++;
+                }
+            });
+        });
+
+        return count;
     }
 
     protected draw(): void {
@@ -143,7 +157,7 @@ export default class Game {
                 return;
             }
 
-            if (cell.hasAroundMineCount) {
+            if (cell.hasAroundMinesCount) {
                 continue;
             }
 

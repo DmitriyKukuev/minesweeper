@@ -1,10 +1,10 @@
-import {isDebug} from '@/helper/env.ts';
+import {isDebug, isDev} from '@/helper/env.ts';
 
 const MAX_AROUND_MINE_COUNT = 8;
 
 export default class Cell {
     protected checked: boolean = false;
-    public aroundMineCount: number = 0;
+    protected aroundMinesCount: number = 0;
     protected mine: boolean = false;
     public readonly id: string = '';
 
@@ -21,8 +21,8 @@ export default class Cell {
         return this.mine;
     }
 
-    public get hasAroundMineCount(): boolean {
-        return this.aroundMineCount > 0;
+    public get hasAroundMinesCount(): boolean {
+        return this.aroundMinesCount > 0;
     }
 
     public get isChecked(): boolean {
@@ -31,7 +31,7 @@ export default class Cell {
 
     public setMine(): this {
         this.mine = true
-        this.aroundMineCount = -1; // для дебага
+        this.aroundMinesCount = -1; // для дебага
 
         return this;
     }
@@ -48,7 +48,7 @@ export default class Cell {
         }
 
         if (!this.hasMine) {
-            this.aroundMineCount = value;
+            this.aroundMinesCount = value;
         }
 
         return this;
@@ -96,7 +96,7 @@ export default class Cell {
 
     //todo refac и красивый квадрат
     public draw(): void {
-        if (isDebug()) {
+        if (isDev() && isDebug()) {
             this.cheatDraw();
             return;
         }
@@ -124,10 +124,10 @@ export default class Cell {
                 this.context.fill();
             }
 
-            if (this.hasAroundMineCount) {
+            if (this.hasAroundMinesCount) {
                 this.context.fillStyle = '#111111';
                 this.context.font = '14px Arial';
-                this.context.fillText(String(this.aroundMineCount), centerX, centerY);
+                this.context.fillText(String(this.aroundMinesCount), centerX, centerY);
             }
         } else {
             this.context.fillStyle = '#1476a9';
@@ -171,10 +171,10 @@ export default class Cell {
             this.context.fill();
         }
 
-        if (this.hasAroundMineCount) {
+        if (this.hasAroundMinesCount) {
             this.context.fillStyle = '#111111';
             this.context.font = '14px Arial';
-            this.context.fillText(String(this.aroundMineCount), centerX, centerY);
+            this.context.fillText(String(this.aroundMinesCount), centerX, centerY);
         }
     }
 }
