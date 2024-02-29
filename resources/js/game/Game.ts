@@ -11,20 +11,20 @@ enum EGameStatus {
 
 export default class Game {
     protected cells: Cell[][] = [];
-    protected columns: number = 0; // todo не нравится название
-    protected rows: number = 0; // todo не нравится название
+    protected columnsCount: number = 0;
+    protected rowsCount: number = 0;
     protected cellSize: number = 0;
-    protected mineCount: number = 0;
+    protected minesCount: number = 0;
     protected status: EGameStatus = EGameStatus.created;
 
     constructor(
         settings, //todo сделать объект настроек и передавать
         protected context: CanvasRenderingContext2D, // todo refac
     ) {
-        this.columns = settings.columns;
-        this.rows = settings.rows;
+        this.columnsCount = settings.columns;
+        this.rowsCount = settings.rows;
         this.cellSize = settings.cellSize;
-        this.mineCount = settings.mineCount;
+        this.minesCount = settings.mineCount;
     }
 
     get isStarted(): boolean {
@@ -61,10 +61,10 @@ export default class Game {
     public init(): void {
         this.cells = [];
 
-        for (let i = 0; i < this.rows; i++) {
+        for (let i = 0; i < this.rowsCount; i++) {
             const row: Cell[] = [];
 
-            for (let j = 0; j < this.columns; j++) {
+            for (let j = 0; j < this.columnsCount; j++) {
                 row.push(new Cell(this.cellSize, i, j, this.context));
             }
 
@@ -81,9 +81,9 @@ export default class Game {
      */
     public generateMines(firstCell?: Cell): void {
         if (!firstCell) {
-            for (let i = 0; i < this.mineCount; i++) {
-                const column = random(0, this.columns - 1);
-                const row = random(0, this.rows - 1);
+            for (let i = 0; i < this.minesCount; i++) {
+                const column = random(0, this.columnsCount - 1);
+                const row = random(0, this.rowsCount - 1);
                 const cell = this.cells[row][column];
 
                 cell.setMine();
@@ -93,20 +93,20 @@ export default class Game {
         }
 
         const excludedColumnIndexes = [
-            firstCell.column - 1,
-            firstCell.column,
-            firstCell.column + 1,
+            firstCell.columnIndex - 1,
+            firstCell.columnIndex,
+            firstCell.columnIndex + 1,
         ];
 
         const excludedRowIndexes = [
-            firstCell.row - 1,
-            firstCell.row,
-            firstCell.row + 1,
+            firstCell.rowIndex - 1,
+            firstCell.rowIndex,
+            firstCell.rowIndex + 1,
         ];
 
-        for (let i = 0; i < this.mineCount; i++) {
-            const column = randomWithExcluded(0, this.columns - 1, excludedColumnIndexes);
-            const row = randomWithExcluded(0, this.rows - 1, excludedRowIndexes);
+        for (let i = 0; i < this.minesCount; i++) {
+            const column = randomWithExcluded(0, this.columnsCount - 1, excludedColumnIndexes);
+            const row = randomWithExcluded(0, this.rowsCount - 1, excludedRowIndexes);
             const cell = this.cells[row][column];
 
             cell.setMine();
@@ -128,8 +128,7 @@ export default class Game {
             this.start(firstCell);
         }
 
-        const cellsToCheckAround: Cell[] = [];
-        cellsToCheckAround.push(firstCell);
+        const cellsToCheckAround: Cell[] = [firstCell];
 
         do {
             const cell = cellsToCheckAround.pop();
@@ -150,7 +149,7 @@ export default class Game {
 
             cell.forAroundCells((nearCell) => {
                 cellsToCheckAround.push(nearCell);
-            }, this.rows, this.columns, this.cells);
+            }, this.cells);
         } while (cellsToCheckAround.length)
     }
 
@@ -165,14 +164,14 @@ export default class Game {
             if (nearCell.hasMine) {
                 aroundMineCount++;
             }
-        }, this.rows, this.columns, this.cells);
+        }, this.cells);
 
         cell.setAroundMineCount(aroundMineCount);
     }
 
     protected setCellsAroundMineCount(): void {
-        for (let row = 0; row < this.rows; row++) {
-            for (let column = 0; column < this.columns; column++) {
+        for (let row = 0; row < this.rowsCount; row++) {
+            for (let column = 0; column < this.columnsCount; column++) {
                 const cell = this.cells[row][column];
 
                 this.setCellAroundMineCount(cell);
