@@ -1,5 +1,5 @@
 import Cell from '@/game/Cell.ts';
-import {random, randomWithExcluded} from '@/helper/random.ts';
+import {random} from '@/helper/random.ts';
 
 enum EGameStatus {
     created,
@@ -90,7 +90,6 @@ export default class Game {
     }
 
     /**
-     * todo - понял, что неправильный алгоритмы генерации
      * @param firstCell Ячейка вокруг и в которой не сгенерируются мины
      */
     public generateMines(firstCell?: Cell): void {
@@ -106,24 +105,39 @@ export default class Game {
             return;
         }
 
-        const excludedColumnIndexes = [
-            firstCell.columnIndex - 1,
-            firstCell.columnIndex,
-            firstCell.columnIndex + 1,
-        ];
-
         const excludedRowIndexes = [
             firstCell.rowIndex - 1,
             firstCell.rowIndex,
             firstCell.rowIndex + 1,
         ];
 
-        for (let i = 0; i < this.minesCount; i++) {
-            const column = randomWithExcluded(0, this.columnsCount - 1, excludedColumnIndexes);
-            const row = randomWithExcluded(0, this.rowsCount - 1, excludedRowIndexes);
-            const cell = this.cells[row][column];
+        const excludedColumnIndexes = [
+            firstCell.columnIndex - 1,
+            firstCell.columnIndex,
+            firstCell.columnIndex + 1,
+        ];
 
-            cell.setMine();
+        const localCells: Cell[] = [];
+
+        this.cells.forEach((row) => {
+            row.forEach((cell) => {
+                if (
+                    excludedRowIndexes.includes(cell.rowIndex)
+                    && excludedColumnIndexes.includes(cell.columnIndex)
+                ) {
+                    return;
+                }
+
+                localCells.push(cell);
+            });
+        });
+
+        for (let i = 0; i < this.minesCount; i++) {
+            const index = random(0, localCells.length - 1);
+            const localCell = localCells[index];
+            const realCell = this.cells[localCell.rowIndex][localCell.columnIndex];
+            realCell.setMine();
+            localCells.splice(index, 1);
         }
     }
 
