@@ -171,6 +171,31 @@ export default class Game {
         return this.cells[row][column];
     }
 
+    /**
+     * Получить массив ячеек вокруг ячейки
+     * @param cell
+     * @protected
+     */
+    protected getAroundCells(cell: Cell): Cell[] {
+        const aroundCells: Cell[] = [];
+
+        for (let i = cell.rowIndex - 1; i <= cell.rowIndex + 1; i++) {
+            for (let j = cell.columnIndex - 1; j <= cell.columnIndex + 1; j++) {
+                if (
+                    (i === cell.rowIndex && j === cell.columnIndex)
+                    || !this.cells[i]
+                    || !this.cells[i][j]
+                ) {
+                    continue;
+                }
+
+                aroundCells.push(this.cells[i][j]);
+            }
+        }
+
+        return aroundCells;
+    }
+
     public onLeftClick(x: number, y: number): void {
         const firstCell = this.getCellByCoords(x, y);
 
@@ -199,9 +224,9 @@ export default class Game {
                 continue;
             }
 
-            cell.forAroundCells((nearCell) => {
+            this.getAroundCells(cell).forEach((nearCell) => {
                 cellsToCheckAround.push(nearCell);
-            }, this.cells);
+            });
         } while (cellsToCheckAround.length)
 
         this.draw(cellsToDraw);
@@ -218,13 +243,15 @@ export default class Game {
             return;
         }
 
-        let aroundMineCount = 0;
+        const aroundMineCount = this
+            .getAroundCells(cell)
+            .reduce((count, nearCell) => {
+                if (nearCell.hasMine) {
+                    count++;
+                }
 
-        cell.forAroundCells((nearCell) => {
-            if (nearCell.hasMine) {
-                aroundMineCount++;
-            }
-        }, this.cells);
+                return count;
+            }, 0);
 
         cell.setAroundMineCount(aroundMineCount);
     }

@@ -64,27 +64,6 @@ export default class Cell {
         return this;
     }
 
-    public forAroundCells(
-        callback: (nearCell: this) => void,
-        allCellsArray: this[][],
-    ): void {
-        for (let i = this.rowIndex - 1; i <= this.rowIndex + 1; i++) {
-            for (let j = this.columnIndex - 1; j <= this.columnIndex + 1; j++) {
-                if (
-                    (i === this.rowIndex && j === this.columnIndex)
-                    || !allCellsArray[i]
-                    || !allCellsArray[i][j]
-                ) {
-                    continue;
-                }
-
-                const nearCell = allCellsArray[i][j];
-
-                callback(nearCell);
-            }
-        }
-    }
-
     public check(): this {
         if (this.isFlagged || this.isChecked) {
             return this;
