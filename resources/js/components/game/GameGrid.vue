@@ -21,7 +21,12 @@
 
         <div>realMinesCount: {{ game?.realMinesCount ?? 0 }}</div>
 
-        <canvas v-bind="canvasAttrs" ref="canvasEl" @click="onCanvasClick"/>
+        <canvas
+            v-bind="canvasAttrs"
+            ref="canvasEl"
+            @click="canvasLeftClick"
+            @contextmenu.prevent="canvasRightClick"
+        />
     </div>
 </template>
 
@@ -45,8 +50,12 @@ const canvasAttrs = computed(() => ({
     height: settings.rows * settings.cellSize,
 }));
 
-function onCanvasClick(event: MouseEvent) {
-    game.value?.onClick(event.offsetX, event.offsetY);
+function canvasLeftClick(event: MouseEvent) {
+    game.value?.onLeftClick(event.offsetX, event.offsetY);
+}
+
+function canvasRightClick(event: MouseEvent) {
+    game.value?.onRightClick(event.offsetX, event.offsetY);
 }
 
 function start() {

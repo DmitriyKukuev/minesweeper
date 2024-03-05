@@ -19,7 +19,7 @@ export default class Game {
 
     constructor(
         settings, //todo сделать объект настроек и передавать
-        protected context: CanvasRenderingContext2D, // todo refac
+        protected context: CanvasRenderingContext2D,
     ) {
         this.columnsCount = settings.columns;
         this.rowsCount = settings.rows;
@@ -50,6 +50,12 @@ export default class Game {
         return count;
     }
 
+    protected setStatus(status: EGameStatus): this {
+        this.status = status;
+
+        return this;
+    }
+
     protected draw(): void {
         for (const rowKey in this.cells) {
             const row = this.cells[rowKey];
@@ -68,7 +74,7 @@ export default class Game {
     public start(firstCell?: Cell): void {
         this.generateMines(firstCell);
         this.setCellsAroundMineCount();
-        this.status = EGameStatus.started;
+        this.setStatus(EGameStatus.started);
         this.draw(); // todo remove
     }
 
@@ -85,7 +91,7 @@ export default class Game {
             this.cells.push(row);
         }
 
-        this.status = EGameStatus.initiated;
+        this.setStatus(EGameStatus.initiated);
         this.draw();
     }
 
@@ -149,7 +155,7 @@ export default class Game {
     }
 
     //todo отдельный метод для отрисовки мин
-    public onClick(x: number, y: number): void {
+    public onLeftClick(x: number, y: number): void {
         const firstCell = this.getCellByCoords(x, y);
 
         if (!this.isStarted) {
@@ -165,7 +171,7 @@ export default class Game {
                 continue;
             }
 
-            cell.onClick();
+            cell.check();
 
             if (cell.hasMine) {
                 return;
@@ -179,6 +185,11 @@ export default class Game {
                 cellsToCheckAround.push(nearCell);
             }, this.cells);
         } while (cellsToCheckAround.length)
+    }
+
+    public onRightClick(x: number, y: number): void {
+        const cell = this.getCellByCoords(x, y);
+        cell.flag();
     }
 
     protected setCellAroundMineCount(cell: Cell): void {
