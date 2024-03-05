@@ -1,5 +1,6 @@
 import Cell from '@/game/Cell.ts';
 import {random} from '@/helper/random.ts';
+import {env} from '@/helper/env.ts';
 
 enum EGameStatus {
     created,
@@ -56,16 +57,28 @@ export default class Game {
         return this;
     }
 
-    protected draw(): void {
-        for (const rowKey in this.cells) {
-            const row = this.cells[rowKey];
+    /**
+     * Отрисовка всего поля, или массива ячеек, или ячейки
+     * @param cells Ячейка или ячейки для отрисовки
+     */
+    protected draw(cells?: Cell|Array<Cell>): void {
+        if (!cells) {
+            this.cells.forEach((row) => {
+                row.forEach((cell) => {
+                    cell.draw();
+                });
+            });
 
-            for (const columnKey in row) {
-                const cell = row[columnKey];
-
-                cell.draw();
-            }
+            return;
         }
+
+        if (!Array.isArray(cells)) {
+            cells = [<Cell>cells];
+        }
+
+        cells?.forEach((cell) => {
+            cell.draw();
+        });
     }
 
     /**
@@ -75,7 +88,11 @@ export default class Game {
         this.generateMines(firstCell);
         this.setCellsAroundMineCount();
         this.setStatus(EGameStatus.started);
-        this.draw(); // todo remove
+
+        // Если включены читы, то отрисовать все поле
+        if (env.isCheatsEnabled && env.isDev) {
+            this.draw();
+        }
     }
 
     public init(): void {
@@ -154,7 +171,6 @@ export default class Game {
         return this.cells[row][column];
     }
 
-    //todo отдельный метод для отрисовки мин
     public onLeftClick(x: number, y: number): void {
         const firstCell = this.getCellByCoords(x, y);
 
@@ -163,6 +179,7 @@ export default class Game {
         }
 
         const cellsToCheckAround: Cell[] = [firstCell];
+        const cellsToDraw: Cell[] = [];
 
         do {
             const cell = cellsToCheckAround.pop();
@@ -172,6 +189,7 @@ export default class Game {
             }
 
             cell.check();
+            cellsToDraw.push(cell);
 
             if (cell.hasMine) {
                 return;
@@ -185,11 +203,14 @@ export default class Game {
                 cellsToCheckAround.push(nearCell);
             }, this.cells);
         } while (cellsToCheckAround.length)
+
+        this.draw(cellsToDraw);
     }
 
     public onRightClick(x: number, y: number): void {
         const cell = this.getCellByCoords(x, y);
         cell.flag();
+        this.draw(cell);
     }
 
     protected setCellAroundMineCount(cell: Cell): void {

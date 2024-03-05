@@ -1,4 +1,4 @@
-import {isDebug, isDev} from '@/helper/env.ts';
+import {env} from '@/helper/env.ts';
 
 const MAX_AROUND_MINE_COUNT = 8;
 
@@ -9,7 +9,6 @@ enum ECellStatus {
 }
 
 export default class Cell {
-    protected checked: boolean = false;
     protected aroundMinesCount: number = 0;
     protected mine: boolean = false;
     public readonly id: string = '';
@@ -55,7 +54,7 @@ export default class Cell {
 
     public setAroundMineCount(value: number) {
         if (value > MAX_AROUND_MINE_COUNT) {
-            throw new Error('Максимум 8 мин вокруг');
+            throw new Error(`Максимум ${MAX_AROUND_MINE_COUNT} мин вокруг`);
         }
 
         if (!this.hasMine) {
@@ -94,17 +93,12 @@ export default class Cell {
         //todo завершение игры
         if (this.hasMine) {
             alert('you died');
-            this.setStatus(ECellStatus.checked)
-                .draw();
+            this.setStatus(ECellStatus.checked);
 
             return this;
         }
 
-        //todo делать отрисовку отдельно
-        this.setStatus(ECellStatus.checked)
-            .draw();
-
-        return this;
+        return this.setStatus(ECellStatus.checked);
     }
 
     /**
@@ -121,19 +115,13 @@ export default class Cell {
             this.setStatus(ECellStatus.flagged);
         }
 
-        this.draw();
-
         return this;
     }
 
     //todo refac и красивый квадрат
     //todo методы по отрисовки разных состояний в отдельный класс
-    /**
-     * Отрисовка ячейки
-     * @param isCheatDraw включить читерскую отрисовку
-     */
-    public draw(isCheatDraw?: boolean): void {
-        if (isDev() && isDebug() && isCheatDraw) {
+    public draw(): void {
+        if (env.isCheatsEnabled && env.isDev) {
             this.cheatDraw();
             return;
         }
