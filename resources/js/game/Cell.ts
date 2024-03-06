@@ -31,6 +31,10 @@ export default class Cell {
         return this.aroundMinesCount > 0;
     }
 
+    public get getAroundMinesCount(): number {
+        return this.aroundMinesCount;
+    }
+
     public get isChecked(): boolean {
         return this.status === ECellStatus.checked;
     }

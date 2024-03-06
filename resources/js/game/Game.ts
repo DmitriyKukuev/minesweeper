@@ -73,6 +73,7 @@ export default class Game {
         }
 
         if (!Array.isArray(cells)) {
+            //todo пофиксить линтер
             cells = [<Cell>cells];
         }
 
@@ -196,26 +197,24 @@ export default class Game {
         return aroundCells;
     }
 
-    public onLeftClick(x: number, y: number): void {
-        const firstCell = this.getCellByCoords(x, y);
-
-        if (!this.isStarted) {
-            this.start(firstCell);
+    protected checkCells(cellsToCheck: Cell|Array<Cell>): void {
+        if (!Array.isArray(cellsToCheck)) {
+            cellsToCheck = [cellsToCheck];
         }
 
-        const cellsToCheckAround: Cell[] = [firstCell];
         const cellsToDraw: Cell[] = [];
 
         do {
-            const cell = cellsToCheckAround.pop();
+            const cell = cellsToCheck.pop();
 
-            if (!cell || cell.isChecked) {
+            if (!cell || cell.isChecked || cell.isFlagged) {
                 continue;
             }
 
             cell.check();
             cellsToDraw.push(cell);
 
+            //todo завершение игры
             if (cell.hasMine) {
                 return;
             }
@@ -225,11 +224,55 @@ export default class Game {
             }
 
             this.getAroundCells(cell).forEach((nearCell) => {
-                cellsToCheckAround.push(nearCell);
+                //todo какая-то херня с ts линтером
+                (<Array<Cell>>cellsToCheck).push(nearCell);
             });
-        } while (cellsToCheckAround.length)
+        } while (cellsToCheck.length)
 
         this.draw(cellsToDraw);
+    }
+
+    /**
+     * Чекнуть ячейки вокруг с учетом выставленных флажков и количества мин начальной ячейки
+     * @param firstCell
+     * @protected
+     */
+    protected checkAroundCell(firstCell: Cell): void {
+        if (!firstCell.hasAroundMinesCount) {
+            return;
+        }
+
+        const aroundCells = this.getAroundCells(firstCell);
+
+        const aroundFlagsCount = aroundCells.reduce((count, cell) => {
+            if (cell.isFlagged) {
+                count++;
+            }
+
+            return count;
+        }, 0)
+
+        if (aroundFlagsCount !== firstCell.getAroundMinesCount) {
+            return;
+        }
+
+        this.checkCells(aroundCells);
+    }
+
+    public onLeftClick(x: number, y: number): void {
+        const firstCell = this.getCellByCoords(x, y);
+
+        if (!this.isStarted) {
+            this.start(firstCell);
+        }
+
+        if (firstCell.isChecked) {
+            this.checkAroundCell(firstCell);
+
+            return;
+        }
+
+        this.checkCells(firstCell);
     }
 
     public onRightClick(x: number, y: number): void {
