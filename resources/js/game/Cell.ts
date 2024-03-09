@@ -73,14 +73,6 @@ export default class Cell {
             return this;
         }
 
-        //todo завершение игры
-        if (this.hasMine) {
-            alert('you died');
-            this.setStatus(ECellStatus.checked);
-
-            return this;
-        }
-
         return this.setStatus(ECellStatus.checked);
     }
 

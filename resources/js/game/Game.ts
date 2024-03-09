@@ -18,16 +18,20 @@ export default class Game {
     protected minesCount: number = 0;
     protected status: EGameStatus = EGameStatus.created;
 
+    protected hasCheckedMine = false;
+    protected checkedCellsCount = 0;
+
     constructor(
-        settings, //todo сделать объект настроек и передавать
+        settings, //todo сделать класс настроек и передавать его экземпляр
         protected context: CanvasRenderingContext2D,
     ) {
         this.columnsCount = settings.columns;
         this.rowsCount = settings.rows;
         this.cellSize = settings.cellSize;
-        this.minesCount = settings.mineCount;
+        this.minesCount = settings.minesCount;
     }
 
+    //region Геттеры
     public get isStarted(): boolean {
         return this.status === EGameStatus.started;
     }
@@ -51,52 +55,14 @@ export default class Game {
         return count;
     }
 
-    protected setStatus(status: EGameStatus): this {
-        this.status = status;
-
-        return this;
+    protected get allWithoutMinesCellsChecked(): boolean {
+        return this.checkedCellsCount + this.minesCount === this.rowsCount * this.columnsCount;
     }
+    //endregion
 
-    /**
-     * Отрисовка всего поля, или массива ячеек, или ячейки
-     * @param cells Ячейка или ячейки для отрисовки
-     */
-    protected draw(cells?: Cell|Array<Cell>): void {
-        if (!cells) {
-            this.cells.forEach((row) => {
-                row.forEach((cell) => {
-                    cell.draw();
-                });
-            });
-
-            return;
-        }
-
-        if (!Array.isArray(cells)) {
-            //todo пофиксить линтер
-            cells = [<Cell>cells];
-        }
-
-        cells?.forEach((cell) => {
-            cell.draw();
-        });
-    }
-
-    /**
-     * @param firstCell Ячейка вокруг и в которой не сгенерируются мины
-     */
-    public start(firstCell?: Cell): void {
-        this.generateMines(firstCell);
-        this.setCellsAroundMineCount();
-        this.setStatus(EGameStatus.started);
-
-        // Если включены читы, то отрисовать все поле
-        if (env.isCheatsEnabled && env.isDev) {
-            this.draw();
-        }
-    }
-
+    //region Основные методы игры
     public init(): void {
+        this.reboot();
         this.cells = [];
 
         for (let i = 0; i < this.rowsCount; i++) {
@@ -111,6 +77,123 @@ export default class Game {
 
         this.setStatus(EGameStatus.initiated);
         this.draw();
+    }
+
+    /**
+     * @param firstCell Ячейка вокруг и в которой не сгенерируются мины
+     */
+    public start(firstCell?: Cell): void {
+        this.generateMines(firstCell);
+        this.setCellsAroundMineCount();
+        this.startTimer();
+        this.setStatus(EGameStatus.started);
+
+        // Если включены читы, то отрисовать все поле
+        if (env.isCheatsEnabled && env.isDev) {
+            this.draw();
+        }
+    }
+
+    protected finish(status: EGameStatus.won | EGameStatus.lost): void {
+        if (status === EGameStatus.lost) {
+            alert('you lost');
+        } else {
+            alert('you won');
+        }
+
+        this.stopTimer();
+        this.checkMines();
+        this.setStatus(status);
+    }
+
+    /**
+     * Перезагрузить информацию игры для начала новой
+     * @protected
+     */
+    protected reboot(): void {
+        this.hasCheckedMine = false;
+        this.checkedCellsCount = 0;
+        this.setStatus(EGameStatus.created);
+    }
+
+    protected setStatus(status: EGameStatus): this {
+        this.status = status;
+
+        return this;
+    }
+
+    /**
+     * Отрисовка всего поля, или массива ячеек, или ячейки
+     * @param cells Ячейка или ячейки для отрисовки
+     */
+    protected draw(cells?: Cell|Array<Cell>): void {
+        // Если ячейки не выбраны, то рисуем все поле
+        if (!cells) {
+            this.cells.forEach((row) => {
+                row.forEach((cell) => {
+                    cell.draw();
+                });
+            });
+
+            return;
+        }
+
+        if (!Array.isArray(cells)) {
+            cells = [cells];
+        }
+
+        cells.forEach((cell) => {
+            cell.draw();
+        });
+    }
+    //endregion
+
+    //region Обработчики кликов
+    public onLeftClick(x: number, y: number): void {
+        // Нет действий по клику, если игра закончена
+        if (this.isFinished) {
+            return;
+        }
+
+        const firstCell = this.getCellByCoords(x, y);
+
+        if (!this.isStarted) {
+            this.start(firstCell);
+        }
+
+        if (firstCell.isChecked) {
+            this.checkAroundCell(firstCell);
+
+            return;
+        }
+
+        this.checkCells(firstCell);
+
+        if (this.hasCheckedMine) {
+            this.finish(EGameStatus.lost);
+        } else if (this.allWithoutMinesCellsChecked) {
+            this.finish(EGameStatus.won);
+        }
+    }
+
+    public onRightClick(x: number, y: number): void {
+        // Нет действий по клику, если игра закончена
+        if (this.isFinished) {
+            return;
+        }
+
+        const cell = this.getCellByCoords(x, y);
+        cell.flag();
+        this.draw(cell);
+    }
+    //endregion
+
+    protected startTimer(): void {
+        //todo
+    }
+
+    protected stopTimer(): void {
+        //todo
     }
 
     /**
@@ -211,23 +294,40 @@ export default class Game {
                 continue;
             }
 
-            cell.check();
-            cellsToDraw.push(cell);
-
-            //todo завершение игры
+            // Проигрыш
             if (cell.hasMine) {
-                return;
+                this.hasCheckedMine = true;
+
+                break;
             }
+
+            cell.check();
+            this.checkedCellsCount++;
+            cellsToDraw.push(cell);
 
             if (cell.hasAroundMinesCount) {
                 continue;
             }
 
             this.getAroundCells(cell).forEach((nearCell) => {
-                //todo какая-то херня с ts линтером
                 (<Array<Cell>>cellsToCheck).push(nearCell);
             });
         } while (cellsToCheck.length)
+
+        this.draw(cellsToDraw);
+    }
+
+    protected checkMines(): void {
+        const cellsToDraw: Cell[] = [];
+
+        this.cells.forEach((row) => {
+            row.forEach((cell) => {
+                if (cell.hasMine) {
+                    cell.check();
+                    cellsToDraw.push(cell);
+                }
+            });
+        });
 
         this.draw(cellsToDraw);
     }
@@ -257,28 +357,6 @@ export default class Game {
         }
 
         this.checkCells(aroundCells);
-    }
-
-    public onLeftClick(x: number, y: number): void {
-        const firstCell = this.getCellByCoords(x, y);
-
-        if (!this.isStarted) {
-            this.start(firstCell);
-        }
-
-        if (firstCell.isChecked) {
-            this.checkAroundCell(firstCell);
-
-            return;
-        }
-
-        this.checkCells(firstCell);
-    }
-
-    public onRightClick(x: number, y: number): void {
-        const cell = this.getCellByCoords(x, y);
-        cell.flag();
-        this.draw(cell);
     }
 
     protected setCellAroundMineCount(cell: Cell): void {

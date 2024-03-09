@@ -43,7 +43,7 @@ const game = ref<Game | null>(null);
 const settings = {
     columns: 30,
     rows: 16,
-    mineCount: 99,
+    minesCount: 99,
     cellSize: 25,
 }
 
