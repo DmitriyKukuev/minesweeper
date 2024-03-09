@@ -1,6 +1,7 @@
 import Cell from '@/game/Cell.ts';
 import {random} from '@/helper/random.ts';
 import {env} from '@/helper/env.ts';
+import Timer from '@/game/Timer.ts';
 
 enum EGameStatus {
     created,
@@ -20,6 +21,8 @@ export default class Game {
 
     protected hasCheckedMine = false;
     protected checkedCellsCount = 0;
+
+    protected timer = new Timer();
 
     constructor(
         settings, //todo сделать класс настроек и передавать его экземпляр
@@ -58,6 +61,10 @@ export default class Game {
     protected get allWithoutMinesCellsChecked(): boolean {
         return this.checkedCellsCount + this.minesCount === this.rowsCount * this.columnsCount;
     }
+
+    public get getTimer(): Timer {
+        return this.timer;
+    }
     //endregion
 
     //region Основные методы игры
@@ -85,7 +92,8 @@ export default class Game {
     public start(firstCell?: Cell): void {
         this.generateMines(firstCell);
         this.setCellsAroundMineCount();
-        this.startTimer();
+        this.timer.start();
+        // this.startTimer();
         this.setStatus(EGameStatus.started);
 
         // Если включены читы, то отрисовать все поле
@@ -101,7 +109,8 @@ export default class Game {
             alert('you won');
         }
 
-        this.stopTimer();
+        this.timer.stop();
+        // this.stopTimer();
         this.checkMines();
         this.setStatus(status);
     }
@@ -113,6 +122,7 @@ export default class Game {
     protected reboot(): void {
         this.hasCheckedMine = false;
         this.checkedCellsCount = 0;
+        this.timer.reboot();
         this.setStatus(EGameStatus.created);
     }
 
@@ -187,14 +197,6 @@ export default class Game {
         this.draw(cell);
     }
     //endregion
-
-    protected startTimer(): void {
-        //todo
-    }
-
-    protected stopTimer(): void {
-        //todo
-    }
 
     /**
      * @param firstCell Ячейка вокруг и в которой не сгенерируются мины

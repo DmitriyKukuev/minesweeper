@@ -17,9 +17,12 @@
             </div>
         </div>
 
-        <button class="btn" @click="newGame">new game</button>
+        <div class="flex gap-2">
+            <button class="btn" @click="newGame">new game</button>
+        </div>
 
         <div>realMinesCount: {{ game?.realMinesCount ?? 0 }}</div>
+        <div>playTime: {{ game?.getTimer.toString() ?? 0 }}</div>
 
         <canvas
             v-bind="canvasAttrs"
@@ -41,9 +44,9 @@ const game = ref<Game | null>(null);
 
 // todo класс с настройками игры
 const settings = {
-    columns: 30,
-    rows: 16,
-    minesCount: 99,
+    columns: 10,
+    rows: 10,
+    minesCount: 10,
     cellSize: 25,
 }
 
