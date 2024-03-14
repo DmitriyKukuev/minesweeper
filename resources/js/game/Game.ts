@@ -2,6 +2,7 @@ import Cell from '@/game/Cell.ts';
 import {random} from '@/helper/random.ts';
 import {env} from '@/helper/env.ts';
 import Timer from '@/game/Timer.ts';
+import Settings from '@/game/Settings.ts';
 
 enum EGameStatus {
     created,
@@ -25,13 +26,14 @@ export default class Game {
     protected timer = new Timer();
 
     constructor(
-        settings, //todo сделать класс настроек и передавать его экземпляр
+        settings: Settings,
+        cellSize: number,
         protected context: CanvasRenderingContext2D,
     ) {
-        this.columnsCount = settings.columns;
-        this.rowsCount = settings.rows;
-        this.cellSize = settings.cellSize;
+        this.columnsCount = settings.columnsCount;
+        this.rowsCount = settings.rowsCount;
         this.minesCount = settings.minesCount;
+        this.cellSize = cellSize;
     }
 
     //region Геттеры

@@ -38,21 +38,18 @@
 import {computed, onMounted, ref} from 'vue';
 import Game from '@/game/Game.ts';
 import {EMouseButton} from '@/enums/mouse-button.ts';
+import Settings, {EPreset} from '@/game/Settings.ts';
 
 const canvasEl = ref<HTMLCanvasElement | null>(null);
 const game = ref<Game | null>(null);
 
-// todo класс с настройками игры
-const settings = {
-    columns: 10,
-    rows: 10,
-    minesCount: 10,
-    cellSize: 25,
-}
+const cellSize = 25;
+
+const settings = new Settings(EPreset.professional);
 
 const canvasAttrs = computed(() => ({
-    width: settings.columns * settings.cellSize,
-    height: settings.rows * settings.cellSize,
+    width: settings.columnsCount * cellSize,
+    height: settings.rowsCount * cellSize,
 }));
 
 let leftClickCoords: [number, number] | null = null;
@@ -93,7 +90,7 @@ function init() {
         return;
     }
 
-    game.value = new Game(settings, context);
+    game.value = new Game(settings, cellSize, context);
     game.value?.init();
 }
 
