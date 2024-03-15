@@ -1,21 +1,6 @@
 <template>
     <div class="space-y-2">
-        <div>
-            <div class="todo">
-                todo сделать изменение и вывод настроек
-            </div>
-
-            <div class="font-bold">
-                Настройки
-            </div>
-
-            <div
-                v-for="(value, key) in settings"
-                :key="key"
-            >
-                {{ key }}: {{ value }}
-            </div>
-        </div>
+        <Difficult v-model="settings"/>
 
         <div class="flex gap-2">
             <button class="btn" @click="newGame">new game</button>
@@ -38,18 +23,19 @@
 import {computed, onMounted, ref} from 'vue';
 import Game from '@/game/Game.ts';
 import {EMouseButton} from '@/enums/mouse-button.ts';
-import Settings, {EPreset} from '@/game/Settings.ts';
+import DifficultySettings, {EDefaultPreset} from '@/game/DifficultySettings.ts';
+import Difficult from '@/components/game/Difficult.vue';
 
 const canvasEl = ref<HTMLCanvasElement | null>(null);
 const game = ref<Game | null>(null);
 
 const cellSize = 25;
 
-const settings = new Settings(EPreset.professional);
+const settings = ref(new DifficultySettings(EDefaultPreset.professional));
 
 const canvasAttrs = computed(() => ({
-    width: settings.columnsCount * cellSize,
-    height: settings.rowsCount * cellSize,
+    width: settings.value.columnsCount * cellSize,
+    height: settings.value.rowsCount * cellSize,
 }));
 
 let leftClickCoords: [number, number] | null = null;
@@ -90,7 +76,7 @@ function init() {
         return;
     }
 
-    game.value = new Game(settings, cellSize, context);
+    game.value = new Game(settings.value, cellSize, context);
     game.value?.init();
 }
 

@@ -2,7 +2,7 @@ import Cell from '@/game/Cell.ts';
 import {random} from '@/helper/random.ts';
 import {env} from '@/helper/env.ts';
 import Timer from '@/game/Timer.ts';
-import Settings from '@/game/Settings.ts';
+import DifficultySettings from '@/game/DifficultySettings.ts';
 
 enum EGameStatus {
     created,
@@ -26,7 +26,7 @@ export default class Game {
     protected timer = new Timer();
 
     constructor(
-        settings: Settings,
+        settings: DifficultySettings,
         cellSize: number,
         protected context: CanvasRenderingContext2D,
     ) {
