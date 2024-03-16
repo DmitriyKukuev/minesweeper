@@ -14,10 +14,6 @@ class Env {
     public get isDebug(): boolean {
         return this.getValue('VITE_APP_DEBUG') === 'true';
     }
-
-    public get isCheatsEnabled(): boolean {
-        return this.getValue('VITE_CHEATS_ENABLED') === 'true';
-    }
 }
 
 export const env = new Env();

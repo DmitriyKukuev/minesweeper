@@ -99,11 +99,6 @@ export default class Game {
         this.timer.start();
         // this.startTimer();
         this.setStatus(EGameStatus.started);
-
-        // Если включены читы, то отрисовать все поле
-        if (env.isCheatsEnabled && env.isDev) {
-            this.draw();
-        }
     }
 
     protected finish(status: EGameStatus.won | EGameStatus.lost): void {
