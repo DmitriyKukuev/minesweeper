@@ -13,12 +13,14 @@ enum EGameStatus {
 }
 
 export default class Game {
-    protected cells: Cell[][] = [];
     protected columnsCount: number = 0;
     protected rowsCount: number = 0;
     protected cellSize: number = 0;
     protected minesCount: number = 0;
     protected status: EGameStatus = EGameStatus.created;
+
+    protected cells: Cell[][] = [];
+    protected hoveredCells: Cell[] = [];
 
     protected hasCheckedMine = false;
     protected checkedCellsCount = 0;
@@ -198,10 +200,42 @@ export default class Game {
         cell.flag();
         this.draw(cell);
     }
+
+    /**
+     * Подсветка ячеек, которые откроются при клике
+     * @param x
+     * @param y
+     */
+    public onLeftDown(x: number, y: number): void {
+        if (this.isFinished) {
+            return;
+        }
+
+        const cell = this.getCellByCoords(x, y);
+
+        if (cell.isChecked) {
+            const cellsToHover = this
+                .getAroundCells(cell)
+                .filter((cell) => !cell.isChecked && !cell.isFlagged)
+
+            this.hoveredCells.push(...cellsToHover);
+        } else {
+            this.hoveredCells.push(cell);
+        }
+
+        this.hoveredCells.forEach((cell) => cell.setPressed(true));
+        this.draw(this.hoveredCells);
+    }
+
+    public onLeftUp(): void {
+        this.hoveredCells.forEach((cell) => cell.setPressed(false));
+        this.draw(this.hoveredCells);
+        this.hoveredCells = [];
+    }
     //endregion
 
     /**
-     * @param firstCell Ячейка вокруг и в которой не сгенерируются мины
+     * @param firstCell Ячейка, вокруг и в которой не сгенерируются мины
      */
     public generateMines(firstCell?: Cell): void {
         if (!firstCell) {

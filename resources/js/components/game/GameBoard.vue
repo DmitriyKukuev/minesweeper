@@ -29,7 +29,7 @@ import DifficultSettingsComponent from '@/components/game/DifficultSettingsCompo
 const canvasEl = ref<HTMLCanvasElement | null>(null);
 const game = ref<Game | null>(null);
 
-const cellSize = 25;
+const cellSize = 30;
 
 const settings = ref(new DifficultSettings(EDefaultPreset.professional));
 
@@ -44,6 +44,7 @@ function onMouseDown(event: MouseEvent) {
     if (event.button === EMouseButton.left) {
         // Клик по полю происходит в mouseup
         leftClickCoords = [event.offsetX, event.offsetY];
+        game.value?.onLeftDown(...leftClickCoords);
 
         return;
     }
@@ -91,5 +92,9 @@ function newGame() {
 
 onMounted(() => {
     init();
+
+    window.addEventListener('mouseup', () => {
+        game.value?.onLeftUp();
+    });
 });
 </script>

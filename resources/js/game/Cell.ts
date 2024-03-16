@@ -9,10 +9,11 @@ enum ECellStatus {
 }
 
 export default class Cell {
+    public readonly id: string = '';
     protected aroundMinesCount: number = 0;
     protected mine: boolean = false;
-    public readonly id: string = '';
     protected status: ECellStatus = ECellStatus.unmarked;
+    protected pressed: boolean = false;
 
     constructor(
         protected size: number,
@@ -41,6 +42,16 @@ export default class Cell {
 
     public get isFlagged(): boolean {
         return this.status === ECellStatus.flagged;
+    }
+
+    public get isPressed(): boolean {
+        return this.pressed;
+    }
+
+    public setPressed(state: boolean): this {
+        this.pressed = state;
+
+        return this;
     }
 
     public setMine(): this {
@@ -109,7 +120,12 @@ export default class Cell {
 
         this.ctx.clearRect(x, y, this.size, this.size);
 
-        if (this.isChecked) {
+        if (this.isPressed) {
+            this.ctx.fillStyle = '#0f4660';
+            this.ctx.fillRect(x, y, this.size, this.size);
+            this.ctx.strokeStyle = '#00fffa';
+            this.ctx.strokeRect(x + 1, y + 1, this.size - 2, this.size - 2);
+        } else if (this.isChecked) {
             this.ctx.fillStyle = '#c3cfd5';
             this.ctx.fillRect(x, y, this.size, this.size);
             this.ctx.strokeStyle = '#111111';
@@ -153,6 +169,7 @@ export default class Cell {
     }
 
     /**
+     * todo вырубить читы. ненужны
      * Отрисовка с читерством - видно цифры и мины
      * @protected
      */
