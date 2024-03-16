@@ -25,10 +25,10 @@
 </template>
 
 <script setup lang="ts">
-import DifficultySettings, {EDefaultPreset} from '@/game/DifficultySettings.ts';
+import DifficultSettings, {EDefaultPreset} from '@/game/DifficultSettings.ts';
 import {computed} from 'vue';
 
-const settings = defineModel<DifficultySettings>({required: true});
+const settings = defineModel<DifficultSettings>({required: true});
 
 const defaultPresetKeys = computed(() => {
     return Object.keys(EDefaultPreset);

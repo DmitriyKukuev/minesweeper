@@ -28,7 +28,7 @@ const defaultPresets: Record<EDefaultPreset, TDifficultPreset> = {
     },
 }
 
-export default class DifficultySettings {
+export default class DifficultSettings {
     public columnsCount: number = 0;
     public rowsCount: number = 0;
     public minesCount: number = 0;

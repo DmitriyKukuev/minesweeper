@@ -1,6 +1,6 @@
 <template>
     <div class="space-y-2">
-        <Difficult v-model="settings"/>
+        <DifficultSettingsComponent v-model="settings"/>
 
         <div class="flex gap-2">
             <button class="btn" @click="newGame">new game</button>
@@ -20,18 +20,18 @@
 </template>
 
 <script setup lang="ts">
-import {computed, onMounted, ref} from 'vue';
+import {computed, nextTick, onMounted, ref, watch} from 'vue';
 import Game from '@/game/Game.ts';
 import {EMouseButton} from '@/enums/mouse-button.ts';
-import DifficultySettings, {EDefaultPreset} from '@/game/DifficultySettings.ts';
-import Difficult from '@/components/game/Difficult.vue';
+import DifficultSettings, {EDefaultPreset} from '@/game/DifficultSettings.ts';
+import DifficultSettingsComponent from '@/components/game/DifficultSettingsComponent.vue';
 
 const canvasEl = ref<HTMLCanvasElement | null>(null);
 const game = ref<Game | null>(null);
 
 const cellSize = 25;
 
-const settings = ref(new DifficultySettings(EDefaultPreset.professional));
+const settings = ref(new DifficultSettings(EDefaultPreset.professional));
 
 const canvasAttrs = computed(() => ({
     width: settings.value.columnsCount * cellSize,
@@ -65,18 +65,23 @@ function onMouseUp(event: MouseEvent) {
     }
 }
 
+// Новая игра при изменении настроек сложности
+watch(settings, () => {
+    nextTick(init);
+}, {deep: true});
+
 function init() {
     if (!canvasEl.value) {
         return;
     }
 
-    const context = canvasEl.value?.getContext('2d', {alpha: false});
+    const ctx = canvasEl.value?.getContext('2d', {alpha: false});
 
-    if (!context) {
+    if (!ctx) {
         return;
     }
 
-    game.value = new Game(settings.value, cellSize, context);
+    game.value = new Game(settings.value, cellSize, ctx);
     game.value?.init();
 }
 

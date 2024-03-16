@@ -2,7 +2,7 @@ import Cell from '@/game/Cell.ts';
 import {random} from '@/helper/random.ts';
 import {env} from '@/helper/env.ts';
 import Timer from '@/game/Timer.ts';
-import DifficultySettings from '@/game/DifficultySettings.ts';
+import DifficultSettings from '@/game/DifficultSettings.ts';
 
 enum EGameStatus {
     created,
@@ -26,9 +26,9 @@ export default class Game {
     protected timer = new Timer();
 
     constructor(
-        settings: DifficultySettings,
+        settings: DifficultSettings,
         cellSize: number,
-        protected context: CanvasRenderingContext2D,
+        protected ctx: CanvasRenderingContext2D,
     ) {
         this.columnsCount = settings.columnsCount;
         this.rowsCount = settings.rowsCount;
@@ -78,7 +78,7 @@ export default class Game {
             const row: Cell[] = [];
 
             for (let j = 0; j < this.columnsCount; j++) {
-                row.push(new Cell(this.cellSize, i, j, this.context));
+                row.push(new Cell(this.cellSize, i, j, this.ctx));
             }
 
             this.cells.push(row);

@@ -18,7 +18,7 @@ export default class Cell {
         protected size: number,
         public rowIndex: number,
         public columnIndex: number,
-        protected context: CanvasRenderingContext2D,
+        protected ctx: CanvasRenderingContext2D,
     ) {
         this.id = `${rowIndex}-${columnIndex}`;
     }
@@ -107,47 +107,47 @@ export default class Cell {
         const centerX = x + halsSize;
         const centerY = y + halsSize;
 
-        this.context.clearRect(x, y, this.size, this.size);
+        this.ctx.clearRect(x, y, this.size, this.size);
 
         if (this.isChecked) {
-            this.context.fillStyle = '#c3cfd5';
-            this.context.fillRect(x, y, this.size, this.size);
-            this.context.strokeStyle = '#111111';
-            this.context.strokeRect(x + 1, y + 1, this.size - 2, this.size - 2);
+            this.ctx.fillStyle = '#c3cfd5';
+            this.ctx.fillRect(x, y, this.size, this.size);
+            this.ctx.strokeStyle = '#111111';
+            this.ctx.strokeRect(x + 1, y + 1, this.size - 2, this.size - 2);
 
             if (this.hasMine) {
                 const radius = Math.ceil(this.size / 4);
 
-                this.context.beginPath();
-                this.context.arc(centerX, centerY, radius, 0, Math.PI * 4);
-                this.context.fillStyle = '#e51919';
-                this.context.fill();
+                this.ctx.beginPath();
+                this.ctx.arc(centerX, centerY, radius, 0, Math.PI * 4);
+                this.ctx.fillStyle = '#e51919';
+                this.ctx.fill();
             }
 
             if (this.hasAroundMinesCount) {
-                this.context.fillStyle = '#111111';
-                this.context.font = '14px Arial';
-                this.context.fillText(String(this.aroundMinesCount), centerX, centerY);
+                this.ctx.fillStyle = '#111111';
+                this.ctx.font = '14px Arial';
+                this.ctx.fillText(String(this.aroundMinesCount), centerX, centerY);
             }
         } else {
-            this.context.fillStyle = '#1476a9';
-            this.context.fillRect(x, y, this.size, this.size);
-            this.context.strokeStyle = '#00fffa';
-            this.context.strokeRect(x + 1, y + 1, this.size - 2, this.size - 2);
+            this.ctx.fillStyle = '#1476a9';
+            this.ctx.fillRect(x, y, this.size, this.size);
+            this.ctx.strokeStyle = '#00fffa';
+            this.ctx.strokeRect(x + 1, y + 1, this.size - 2, this.size - 2);
 
             if (this.isFlagged) {
                 const delta = this.size * 2/5;
-                this.context.fillStyle = '#ce4747';
-                this.context.strokeStyle = '#111111';
-                this.context.beginPath();
-                this.context.moveTo(x + delta, y + 1/2 * delta);
-                this.context.lineTo(x + 2 * delta, y  + delta);
-                this.context.lineTo(x + delta, y + 3/2 * delta);
-                this.context.closePath();
-                this.context.fill();
-                this.context.moveTo(x + delta, y + 3/2 * delta);
-                this.context.lineTo(x + delta, y + 2 * delta);
-                this.context.stroke();
+                this.ctx.fillStyle = '#ce4747';
+                this.ctx.strokeStyle = '#111111';
+                this.ctx.beginPath();
+                this.ctx.moveTo(x + delta, y + 1/2 * delta);
+                this.ctx.lineTo(x + 2 * delta, y  + delta);
+                this.ctx.lineTo(x + delta, y + 3/2 * delta);
+                this.ctx.closePath();
+                this.ctx.fill();
+                this.ctx.moveTo(x + delta, y + 3/2 * delta);
+                this.ctx.lineTo(x + delta, y + 2 * delta);
+                this.ctx.stroke();
             }
         }
     }
@@ -163,48 +163,48 @@ export default class Cell {
         const centerX = x + halsSize;
         const centerY = y + halsSize;
 
-        this.context.clearRect(x, y, this.size, this.size);
+        this.ctx.clearRect(x, y, this.size, this.size);
 
         if (this.isChecked) {
-            this.context.fillStyle = '#c3cfd5';
-            this.context.fillRect(x, y, this.size, this.size);
-            this.context.strokeStyle = '#111111';
-            this.context.strokeRect(x + 1, y + 1, this.size - 2, this.size - 2);
+            this.ctx.fillStyle = '#c3cfd5';
+            this.ctx.fillRect(x, y, this.size, this.size);
+            this.ctx.strokeStyle = '#111111';
+            this.ctx.strokeRect(x + 1, y + 1, this.size - 2, this.size - 2);
         } else {
-            this.context.fillStyle = '#1476a9';
-            this.context.fillRect(x, y, this.size, this.size);
-            this.context.strokeStyle = '#00fffa';
-            this.context.strokeRect(x + 1, y + 1, this.size - 2, this.size - 2);
+            this.ctx.fillStyle = '#1476a9';
+            this.ctx.fillRect(x, y, this.size, this.size);
+            this.ctx.strokeStyle = '#00fffa';
+            this.ctx.strokeRect(x + 1, y + 1, this.size - 2, this.size - 2);
         }
 
         if (this.hasMine) {
             const radius = Math.ceil(this.size / 4);
 
-            this.context.beginPath();
-            this.context.arc(centerX, centerY, radius, 0, Math.PI * 4);
-            this.context.fillStyle = '#e51919';
-            this.context.fill();
+            this.ctx.beginPath();
+            this.ctx.arc(centerX, centerY, radius, 0, Math.PI * 4);
+            this.ctx.fillStyle = '#e51919';
+            this.ctx.fill();
         }
 
         if (this.hasAroundMinesCount) {
-            this.context.fillStyle = '#111111';
-            this.context.font = '14px Arial';
-            this.context.fillText(String(this.aroundMinesCount), centerX, centerY);
+            this.ctx.fillStyle = '#111111';
+            this.ctx.font = '14px Arial';
+            this.ctx.fillText(String(this.aroundMinesCount), centerX, centerY);
         }
 
         if (this.isFlagged) {
             const delta = this.size * 2/5;
-            this.context.fillStyle = '#ce4747';
-            this.context.strokeStyle = '#111111';
-            this.context.beginPath();
-            this.context.moveTo(x + delta, y + 1/2 * delta);
-            this.context.lineTo(x + 2 * delta, y  + delta);
-            this.context.lineTo(x + delta, y + 3/2 * delta);
-            this.context.closePath();
-            this.context.fill();
-            this.context.moveTo(x + delta, y + 3/2 * delta);
-            this.context.lineTo(x + delta, y + 2 * delta);
-            this.context.stroke();
+            this.ctx.fillStyle = '#ce4747';
+            this.ctx.strokeStyle = '#111111';
+            this.ctx.beginPath();
+            this.ctx.moveTo(x + delta, y + 1/2 * delta);
+            this.ctx.lineTo(x + 2 * delta, y  + delta);
+            this.ctx.lineTo(x + delta, y + 3/2 * delta);
+            this.ctx.closePath();
+            this.ctx.fill();
+            this.ctx.moveTo(x + delta, y + 3/2 * delta);
+            this.ctx.lineTo(x + delta, y + 2 * delta);
+            this.ctx.stroke();
         }
     }
 }
