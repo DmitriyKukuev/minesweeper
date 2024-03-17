@@ -1,0 +1,39 @@
+version: "3.8"
+
+services:
+    php-fpm:
+        container_name: php-fpm
+        build:
+            context: ./../
+            dockerfile: ./docker/php-fpm/Dockerfile
+            args:
+                - PUID=${PUID}
+                - PGID=${PGID}
+        volumes:
+            - ./../:/var/www/
+
+    nginx:
+        container_name: nginx
+        build:
+            context: ./nginx
+        ports:
+            - ${NGINX_HOST_HTTP_PORT}:80
+        volumes:
+            - ..:/var/www:rw
+        depends_on:
+            - php-fpm
+
+    postgres:
+        container_name: postgres
+        build:
+            context: ./postgres
+        ports:
+            - ${DB_PORT}:5432
+        environment:
+            POSTGRES_DB: ${DB_DATABASE}
+            POSTGRES_USER: ${DB_USER}
+            POSTGRES_PASSWORD: ${DB_PASSWORD}
+        volumes:
+            - db-data:/var/lib/postgresql/data:rw
+volumes:
+    db-data:
