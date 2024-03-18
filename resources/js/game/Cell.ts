@@ -1,5 +1,3 @@
-import {env} from '@/helper/env.ts';
-
 const MAX_AROUND_MINE_COUNT = 8;
 
 enum ECellStatus {

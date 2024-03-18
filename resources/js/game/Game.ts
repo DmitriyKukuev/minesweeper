@@ -1,6 +1,5 @@
 import Cell from '@/game/Cell.ts';
 import {random} from '@/helper/random.ts';
-import {env} from '@/helper/env.ts';
 import Timer from '@/game/Timer.ts';
 import DifficultSettings from '@/game/DifficultSettings.ts';
 
@@ -97,7 +96,6 @@ export default class Game {
         this.generateMines(firstCell);
         this.setCellsAroundMineCount();
         this.timer.start();
-        // this.startTimer();
         this.setStatus(EGameStatus.started);
     }
 
@@ -109,7 +107,6 @@ export default class Game {
         }
 
         this.timer.stop();
-        // this.stopTimer();
         this.checkMines();
         this.setStatus(status);
     }
@@ -172,11 +169,9 @@ export default class Game {
 
         if (firstCell.isChecked) {
             this.checkAroundCell(firstCell);
-
-            return;
+        } else {
+            this.checkCells(firstCell);
         }
-
-        this.checkCells(firstCell);
 
         if (this.hasCheckedMine) {
             this.finish(EGameStatus.lost);
@@ -389,6 +384,7 @@ export default class Game {
             return;
         }
 
+        // console.log(true); //todo remove
         this.checkCells(aroundCells);
     }
 
