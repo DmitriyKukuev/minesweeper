@@ -1,15 +1,20 @@
 <template>
-    <div class="space-y-2">
-        <DifficultSettingsComponent v-model="settings"/>
+    <div class="flex flex-col gap-4 mt-40 mx-auto w-fit">
+        <div class="flex flex-col gap-4">
+            <div class="flex items-center gap-4">
+                <button class="btn text-lg" @click="newGame">Новая игра</button>
+                <DifficultSwitcher v-model="settings"/>
+            </div>
 
-        <div class="flex gap-2">
-            <button class="btn" @click="newGame">new game</button>
+            <InfoTable
+                v-if="game"
+                :game="<Game>game"
+                :settings="settings"
+            />
         </div>
 
-        <div>realMinesCount: {{ game?.realMinesCount ?? 0 }}</div>
-        <div>playTime: {{ game?.getTimer.toString() ?? 0 }}</div>
-
         <canvas
+            class="justify-self-center"
             v-bind="canvasAttrs"
             ref="canvasEl"
             @mousedown.prevent="onMouseDown"
@@ -24,7 +29,8 @@ import {computed, nextTick, onMounted, ref, watch} from 'vue';
 import Game from '@/game/Game.ts';
 import {EMouseButton} from '@/enums/mouse-button.ts';
 import DifficultSettings, {EDefaultPreset} from '@/game/DifficultSettings.ts';
-import DifficultSettingsComponent from '@/components/game/DifficultSettingsComponent.vue';
+import DifficultSwitcher from '@/components/game/DifficultSwitcher.vue';
+import InfoTable from "@/components/game/InfoTable.vue";
 
 const canvasEl = ref<HTMLCanvasElement | null>(null);
 const game = ref<Game | null>(null);
@@ -83,7 +89,7 @@ function init() {
     }
 
     game.value = new Game(settings.value, cellSize, ctx);
-    game.value?.init();
+    game.value!.init();
 }
 
 function newGame() {

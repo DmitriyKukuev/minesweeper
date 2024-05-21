@@ -47,6 +47,7 @@ export default class Game {
             || this.status === EGameStatus.lost;
     }
 
+    // todo для дебага
     public get realMinesCount(): number {
         let count = 0;
 
@@ -384,7 +385,6 @@ export default class Game {
             return;
         }
 
-        // console.log(true); //todo remove
         this.checkCells(aroundCells);
     }
 

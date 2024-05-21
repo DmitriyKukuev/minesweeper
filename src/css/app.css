@@ -16,7 +16,7 @@
 @layer components {
     .btn {
         @apply px-3 h-9 inline-flex items-center justify-center gap-2
-        rounded-md bg-blue-500
+        rounded bg-blue-500
         font-semibold leading-6 text-white text-sm
         cursor-pointer
         hover-opacity;
