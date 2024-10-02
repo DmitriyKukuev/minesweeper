@@ -11,7 +11,11 @@ import {invoke} from '@tauri-apps/api';
 import {onMounted} from "vue";
 
 onMounted(async () => {
-    const response = await invoke('example', {name: 'world'});
-    console.log(response);
+    // пример использования tauri-api
+    // @ts-ignore
+    if (import.meta.env.TAURI_PLATFORM == 'windows') {
+        const response = await invoke('example', {name: 'world'});
+        console.log(response);
+    }
 });
 </script>

@@ -1,10 +1,4 @@
-const MAX_AROUND_MINE_COUNT = 8;
-
-enum ECellStatus {
-    unmarked,
-    checked,
-    flagged,
-}
+import {ECellStatus} from '@/enums/ECellStatus.ts';
 
 export default class Cell {
     public readonly id: string = '';
@@ -12,6 +6,8 @@ export default class Cell {
     protected mine: boolean = false;
     protected status: ECellStatus = ECellStatus.unmarked;
     protected pressed: boolean = false;
+
+    protected MAX_AROUND_MINE_COUNT = 8;
 
     constructor(
         protected size: number,
@@ -66,8 +62,8 @@ export default class Cell {
     }
 
     public setAroundMineCount(value: number) {
-        if (value > MAX_AROUND_MINE_COUNT) {
-            throw new Error(`Максимум ${MAX_AROUND_MINE_COUNT} мин вокруг`);
+        if (value > this.MAX_AROUND_MINE_COUNT) {
+            throw new Error(`Максимум ${this.MAX_AROUND_MINE_COUNT} мин вокруг`);
         }
 
         if (!this.hasMine) {
@@ -145,16 +141,16 @@ export default class Cell {
             this.ctx.strokeRect(x + 1, y + 1, this.size - 2, this.size - 2);
 
             if (this.isFlagged) {
-                const delta = this.size * 2/5;
+                const delta = this.size * 2 / 5;
                 this.ctx.fillStyle = '#ce4747';
                 this.ctx.strokeStyle = '#111111';
                 this.ctx.beginPath();
-                this.ctx.moveTo(x + delta, y + 1/2 * delta);
-                this.ctx.lineTo(x + 2 * delta, y  + delta);
-                this.ctx.lineTo(x + delta, y + 3/2 * delta);
+                this.ctx.moveTo(x + delta, y + 1 / 2 * delta);
+                this.ctx.lineTo(x + 2 * delta, y + delta);
+                this.ctx.lineTo(x + delta, y + 3 / 2 * delta);
                 this.ctx.closePath();
                 this.ctx.fill();
-                this.ctx.moveTo(x + delta, y + 3/2 * delta);
+                this.ctx.moveTo(x + delta, y + 3 / 2 * delta);
                 this.ctx.lineTo(x + delta, y + 2 * delta);
                 this.ctx.stroke();
             }

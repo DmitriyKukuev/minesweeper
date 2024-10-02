@@ -19,9 +19,11 @@
 </template>
 
 <script setup lang="ts">
-import DifficultSettings, {defaultPresets, EDefaultPreset} from '@/game/DifficultSettings.ts';
+import DifficultSettings from '@/game/DifficultSettings.ts';
 import {ChevronRightIcon} from '@heroicons/vue/16/solid';
 import {ref} from "vue";
+import {EDefaultPreset} from '@/enums/EDefaultPreset.ts';
+import {defaultPresets} from '@/helper/defaultPresets.ts';
 
 const isOpen = ref(false);
 const settings = defineModel<DifficultSettings>({required: true});

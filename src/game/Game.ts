@@ -1,15 +1,8 @@
 import Cell from '@/game/Cell.ts';
-import {random} from '@/helper/random.ts';
 import Timer from '@/game/Timer.ts';
 import DifficultSettings from '@/game/DifficultSettings.ts';
-
-enum EGameStatus {
-    created,
-    initiated,
-    started,
-    won,
-    lost,
-}
+import {random} from '@/helper/common.ts';
+import {EGameStatus} from '@/enums/EGameStatus.ts';
 
 export default class Game {
     protected columnsCount: number = 0;
@@ -47,21 +40,6 @@ export default class Game {
             || this.status === EGameStatus.lost;
     }
 
-    // todo для дебага
-    public get realMinesCount(): number {
-        let count = 0;
-
-        this.cells.forEach((row) => {
-            row.forEach((cell) => {
-                if (cell.hasMine) {
-                    count++;
-                }
-            });
-        });
-
-        return count;
-    }
-
     protected get allWithoutMinesCellsChecked(): boolean {
         return this.checkedCellsCount + this.minesCount === this.rowsCount * this.columnsCount;
     }
@@ -69,6 +47,7 @@ export default class Game {
     public get getTimer(): Timer {
         return this.timer;
     }
+
     //endregion
 
     //region Основные методы игры
@@ -133,7 +112,7 @@ export default class Game {
      * Отрисовка всего поля, или массива ячеек, или ячейки
      * @param cells Ячейка или ячейки для отрисовки
      */
-    protected draw(cells?: Cell|Array<Cell>): void {
+    protected draw(cells?: Cell | Array<Cell>): void {
         // Если ячейки не выбраны, то рисуем все поле
         if (!cells) {
             this.cells.forEach((row) => {
@@ -153,6 +132,7 @@ export default class Game {
             cell.draw();
         });
     }
+
     //endregion
 
     //region Обработчики кликов
@@ -223,6 +203,7 @@ export default class Game {
         this.draw(this.hoveredCells);
         this.hoveredCells = [];
     }
+
     //endregion
 
     /**
@@ -309,7 +290,7 @@ export default class Game {
         return aroundCells;
     }
 
-    protected checkCells(cellsToCheck: Cell|Array<Cell>): void {
+    protected checkCells(cellsToCheck: Cell | Array<Cell>): void {
         if (!Array.isArray(cellsToCheck)) {
             cellsToCheck = [cellsToCheck];
         }

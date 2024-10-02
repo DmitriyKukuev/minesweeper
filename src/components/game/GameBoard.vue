@@ -27,10 +27,11 @@
 <script setup lang="ts">
 import {computed, nextTick, onMounted, ref, watch} from 'vue';
 import Game from '@/game/Game.ts';
-import {EMouseButton} from '@/enums/mouse-button.ts';
-import DifficultSettings, {EDefaultPreset} from '@/game/DifficultSettings.ts';
+import {EMouseButton} from '@/enums/EMouseButton.ts';
+import DifficultSettings from '@/game/DifficultSettings.ts';
 import DifficultSwitcher from '@/components/game/DifficultSwitcher.vue';
 import InfoTable from "@/components/game/InfoTable.vue";
+import {EDefaultPreset} from '@/enums/EDefaultPreset.ts';
 
 const canvasEl = ref<HTMLCanvasElement | null>(null);
 const game = ref<Game | null>(null);
@@ -82,14 +83,14 @@ function init() {
         return;
     }
 
-    const ctx = canvasEl.value?.getContext('2d', {alpha: false});
+    const ctx = canvasEl.value.getContext('2d', {alpha: false});
 
     if (!ctx) {
         return;
     }
 
     game.value = new Game(settings.value, cellSize, ctx);
-    game.value!.init();
+    game.value.init();
 }
 
 function newGame() {

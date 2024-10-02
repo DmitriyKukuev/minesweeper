@@ -1,39 +1,6 @@
-export enum EDefaultPreset {
-    beginner = 'beginner',
-    amateur = 'amateur',
-    professional = 'professional',
-}
-
-export type TDifficultPreset = {
-    columnsCount: number;
-    rowsCount: number;
-    minesCount: number;
-}
-
-export type TDefaultDifficultPreset = TDifficultPreset & {
-    name: string;
-}
-
-export const defaultPresets: Record<EDefaultPreset, TDefaultDifficultPreset> = {
-    [EDefaultPreset.beginner]: {
-        name: 'Новичок',
-        columnsCount: 9,
-        rowsCount: 9,
-        minesCount: 10,
-    },
-    [EDefaultPreset.amateur]: {
-        name: 'Любитель',
-        columnsCount: 16,
-        rowsCount: 16,
-        minesCount: 40,
-    },
-    [EDefaultPreset.professional]: {
-        name: 'Профессионал',
-        columnsCount: 30,
-        rowsCount: 16,
-        minesCount: 99,
-    },
-}
+import {TDefaultDifficultPreset, TDifficultPreset} from '@/types/difficult-settings.ts';
+import {EDefaultPreset} from '@/enums/EDefaultPreset.ts';
+import {defaultPresets} from '@/helper/defaultPresets.ts';
 
 export default class DifficultSettings {
     public name: string = 'Своя игра';
